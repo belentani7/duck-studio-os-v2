@@ -1,0 +1,434 @@
+// BELENTANI OMEGA ULTRA
+// Autoría: Pedro Belentani
+// Fecha: 2026-08-14
+// DUCK STUDIO OS — RnF (Ritmo & Frequência)
+// Prisma schema — SQLite. Enums emulado como String (SQLite não suporta enum nativo).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── Identidade & Acesso
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  // OWNER | ENGINEER | COLLABORATOR | CLIENT
+  role      String   @default("OWNER")
+  avatar    String?
+  // Se role=CLIENT, vínculo com o registro de cliente
+  clientId  String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client          Client?           @relation("ClientUser", fields: [clientId], references: [id])
+  ownedClients    Client[]          @relation("ClientOwner")
+  createdProjects Project[]         @relation("ProjectCreator")
+  assignedTasks   Task[]            @relation("TaskAssignee")
+  files           FileAsset[]       @relation("FileUploader")
+  versions        Version[]         @relation("VersionCreator")
+  comments        Comment[]         @relation("CommentAuthor")
+  conversations   Conversation[]
+  notifications   Notification[]
+  memories        Memory[]          @relation("MemoryUser")
+  activities      Activity[]        @relation("ActivityActor")
+}
+
+model Studio {
+  id        String   @id @default(cuid())
+  name      String   @default("DUCK STUDIO — RnF")
+  slug      String   @default("duck-rnf")
+  isDemo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// ───────────────────────── CRM
+
+model Client {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  company    String?
+  artistName String?
+  language   String   @default("pt-BR")
+  timezone   String   @default("Europe/Madrid")
+  tags       String   @default("")
+  notes      String?
+  ownerId    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  owner     User      @relation("ClientOwner", fields: [ownerId], references: [id])
+  user      User?     @relation("ClientUser")
+  projects  Project[]
+  invoices  Invoice[]
+  memories  Memory[]
+  contacts  Contact[]
+  histories ClientHistory[]
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  clientId  String
+  name      String
+  role      String?
+  email     String?
+  phone     String?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model ClientHistory {
+  id        String   @id @default(cuid())
+  clientId  String
+  event     String
+  detail    String?
+  createdAt DateTime @default(now())
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Projetos & Áudio
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  clientId    String
+  // Lead | Inquiry | Quoted | Accepted | Waiting Files | Ready | In Production |
+  // Mix Review | Master Review | Client Review | Changes Requested | Approved | Delivered | Archived
+  status      String   @default("Lead")
+  service     String   @default("Mastering")
+  price       Float    @default(0)
+  currency    String   @default("EUR")
+  deadline    DateTime?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  client     Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdBy  User       @relation("ProjectCreator", fields: [ownerId], references: [id])
+  ownerId    String
+  tracks     Track[]
+  files      FileAsset[]
+  versions   Version[]
+  tasks      Task[]
+  activities Activity[]
+  invoices   Invoice[]
+  qcItems    QcItem[]
+}
+
+model QcItem {
+  id        String   @id @default(cuid())
+  projectId String
+  label     String
+  // format | levels | fades | metadata | delivery | artistic
+  category  String   @default("general")
+  checked   Boolean  @default(false)
+  notes     String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Track {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  // vocal | instrumental | stem | reference | mix | master
+  type      String   @default("stem")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  project Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  files   FileAsset[]
+}
+
+model FileAsset {
+  id          String   @id @default(cuid())
+  projectId   String
+  trackId     String?
+  name        String
+  // 00_ADMIN | 01_SOURCE | 02_STEMS | 03_REFERENCES | 04_WORKING | 05_REVISIONS | 06_MASTERS | 07_DELIVERABLES | 99_ARCHIVE
+  category    String   @default("01_SOURCE")
+  mime        String   @default("audio/wav")
+  size        Int      @default(0)
+  hash        String?
+  // uploaded | validated | processing | ready | rejected
+  status      String   @default("uploaded")
+  uploadedById String
+  createdAt   DateTime @default(now())
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  track      Track?  @relation(fields: [trackId], references: [id], onDelete: SetNull)
+  uploadedBy User    @relation("FileUploader", fields: [uploadedById], references: [id])
+}
+
+model Version {
+  id              String   @id @default(cuid())
+  projectId       String
+  name            String
+  parentVersionId String?
+  // draft | review | changes_requested | approved | final | superseded
+  status          String   @default("draft")
+  notes           String?
+  creatorId       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator  User      @relation("VersionCreator", fields: [creatorId], references: [id])
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  versionId String
+  authorId  String
+  body      String
+  timestamp Float?
+  createdAt DateTime @default(now())
+
+  version Version @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  author  User    @relation("CommentAuthor", fields: [authorId], references: [id])
+}
+
+model Task {
+  id         String   @id @default(cuid())
+  projectId  String?
+  title      String
+  // todo | in_progress | done | blocked
+  status     String   @default("todo")
+  // low | medium | high | urgent
+  priority   String   @default("medium")
+  assigneeId String?
+  dueDate    DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  project  Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  assignee User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
+}
+
+// ───────────────────────── Plugins (Asset Manager verificável)
+
+model Plugin {
+  id           String   @id @default(cuid())
+  name         String
+  developer    String
+  version      String
+  // VST3 | AU | AAX | CLAP | Standalone
+  format       String   @default("VST3")
+  category     String   @default("Mastering")
+  tags         String   @default("")
+  // known | available | installed | detected | licensed | update_available | missing | incompatible | unknown
+  status       String   @default("known")
+  officialUrl  String?
+  notes        String?
+  favorite     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  installations PluginInstallation[]
+}
+
+model PluginInstallation {
+  id          String   @id @default(cuid())
+  pluginId    String
+  path        String
+  os          String   @default("win")
+  detected    Boolean  @default(false)
+  lastScanned DateTime?
+  createdAt   DateTime @default(now())
+
+  plugin Plugin @relation(fields: [pluginId], references: [id], onDelete: Cascade)
+}
+
+model PluginPack {
+  id        String   @id @default(cuid())
+  name      String
+  description String?
+  items     String   @default("[]")
+  createdAt DateTime @default(now())
+}
+
+// ───────────────────────── Finance
+
+model Invoice {
+  id        String   @id @default(cuid())
+  clientId  String
+  projectId String?
+  number    String
+  amount    Float
+  currency  String   @default("EUR")
+  // draft | sent | paid | overdue | cancelled
+  status    String   @default("draft")
+  dueDate   DateTime?
+  notes     String?
+  createdAt DateTime @default(now())
+
+  client  Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  items   InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        String   @id @default(cuid())
+  invoiceId String
+  description String
+  quantity  Float    @default(1)
+  unitPrice Float    @default(0)
+  createdAt DateTime @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── IA: Conversas, Memória, Atividade, Notificações
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("Conversa")
+  scope     String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  // ferramentas/ação executada (auditável)
+  toolCall       String?
+  toolResult     String?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Memory {
+  id        String   @id @default(cuid())
+  // user | client | project | studio | system
+  scope     String
+  key       String
+  value     String
+  userId    String?
+  clientId  String?
+  projectId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User?    @relation("MemoryUser", fields: [userId], references: [id], onDelete: Cascade)
+  client Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id         String   @id @default(cuid())
+  actorId    String?
+  projectId  String?
+  action     String
+  resource   String
+  resourceId String?
+  detail     String?
+  createdAt  DateTime @default(now())
+
+  actor   User?    @relation("ActivityActor", fields: [actorId], references: [id], onDelete: SetNull)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  // project | client | system | billing | integration
+  type      String   @default("system")
+  title     String
+  body      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ───────────────────────── Capacidades & Auditoria
+
+model Capability {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  enabled     Boolean  @default(true)
+  configured  Boolean  @default(false)
+  healthy     Boolean  @default(false)
+  provider    String?
+  reason      String?
+  lastChecked DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actor      String
+  role       String
+  action     String
+  resource   String
+  resourceId String?
+  detail     String?
+  source     String   @default("web")
+  createdAt  DateTime @default(now())
+}
+
+// ───────────────────────── Automação & Cadeias de Processamento
+
+model Automation {
+  id          String   @id @default(cuid())
+  name        String
+  // project_status_change | file_uploaded | version_created | version_approved | task_overdue | invoice_overdue
+  trigger     String
+  // JSON: { field, equals, contains } — condição opcional
+  condition   String?
+  // JSON: { type, payload } — notify_owner | notify_client | create_task | set_status | create_invoice
+  action      String
+  enabled     Boolean  @default(true)
+  runs        Int      @default(0)
+  lastRunAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  runLogs     AutomationRun[]
+}
+
+model AutomationRun {
+  id           String   @id @default(cuid())
+  automationId String
+  // success | failed | skipped
+  status       String   @default("success")
+  detail       String?
+  createdAt    DateTime @default(now())
+
+  automation Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+}
+
+model ProcessingChain {
+  id          String   @id @default(cuid())
+  name        String
+  // mastering | mixing | vocal | bus | stereo
+  category    String   @default("mastering")
+  genre       String?
+  description String?
+  // JSON array of steps: [{ plugin, order, settings, notes }]
+  steps       String   @default("[]")
+  favorite    Boolean  @default(false)
+  uses        Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,261 @@
+{
+  "title": "Auditoria automatizada de 3.000 controles - Duck Studio OS",
+  "generatedAt": "2026-08-13T11:06:18+02:00",
+  "methodology": "30 domínios x 20 famílias de controle x 5 métodos de verificação. Matriz estática reproduzível; não equivale a 3.000 testes manuais.",
+  "totals": {
+    "controls": 3000,
+    "static": 1740,
+    "partial": 600,
+    "human": 660,
+    "sourceFiles": 161,
+    "evidenceImages": 16
+  },
+  "domains": [
+    {
+      "domain": "Identidade visual",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Hierarquia tipográfica",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Paleta verde",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Layout desktop",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Layout mobile",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Acessibilidade",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Navegação",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Interações",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Motion design",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Performance frontend",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Arquitetura Next.js",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Qualidade TypeScript",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "APIs internas",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Prisma e dados",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Autenticação",
+      "coverage": 10.0,
+      "anchorExists": false,
+      "STATIC": 0,
+      "PARTIAL": 20,
+      "HUMAN": 80
+    },
+    {
+      "domain": "Permissões",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Auditoria",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "CRM",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Projetos",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Canal do cliente",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Revisões",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Waveform",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Mastering Rack",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Afinador",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Loudness",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Harmônicos",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Automações",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Financeiro",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Documentação",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    },
+    {
+      "domain": "Empacotamento e entrega",
+      "coverage": 70.0,
+      "anchorExists": true,
+      "STATIC": 60,
+      "PARTIAL": 20,
+      "HUMAN": 20
+    }
+  ],
+  "limitations": [
+    "Os 3.000 pontos formam uma matriz de cobertura automatizada, não 3.000 testes manuais independentes.",
+    "Microfone, MIDI e áudio real dependem de hardware e permissão no navegador.",
+    "O detector de loudness atual usa aproximação RMS e não substitui medição BS.1770 certificada.",
+    "A matriz comprova cobertura estrutural; aceitação artística e mix final exigem revisão humana."
+  ]
+}
